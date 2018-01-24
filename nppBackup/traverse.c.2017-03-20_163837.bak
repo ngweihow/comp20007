@@ -1,0 +1,99 @@
+/* This is the prototype for ASSIGNMENT 1 FOR COMP20007
+   Student Number: 828472
+   Modules List, Queues and Stack make use of code provided by Matt Farrugia
+   */
+
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "traverse.h"
+#include "list.h"
+
+
+
+//==========================PART 1=============================================
+
+
+//helper function to check if vertice has been visited or not
+int
+visited(int *vlist, int i){
+	//vertex is visited
+	if(vlist[i]==1){
+		return 1;
+	}
+
+	//if vertex has not been visited
+	return 0;
+}
+
+
+//recursive vertice exploring function
+void
+explorer(Graph* graph, int current, int*vlist){
+	Edge* curr_edge;
+	
+	//marking the vertex as visited
+	vlist[current] = 1;
+	//print that we have visited this place
+	printf("%s\n", graph->vertices[current]->label);
+	
+	//current edge we are looking at from standing vertex
+	curr_edge = graph->vertices[current]->first_edge;
+	
+	//making sure theres always a next edge to look at and not a dead end
+	while(curr_edge->next_edge!=NULL){
+		
+		//checking if we have visited the vertex that we are looking at
+		if(!visited(vlist, curr_edge->v)){
+			//go to the next one if we have not visited it
+			explorer(graph,curr_edge->v,vlist);
+		}
+		
+		else{
+			curr_edge = curr_edge->next_edge;
+		}
+		return;
+	}
+	//return;
+}	
+
+
+void print_dfs(Graph* graph, int source_id) {
+
+	//DECLARATION AND INITIALISATION
+	int i;
+	int* vlist = (int*)malloc((graph->maxn)*sizeof(int));
+	
+	//creating list of visited places, marking them to unvisited as default
+	for(i=0;i<(graph->maxn);i++){
+		vlist[i]= 0;
+	}
+	
+	explorer(graph, source_id, vlist);
+		
+		
+	for(i=0;i<(graph->maxn);i++){
+		printf("%d ",vlist[i]);
+	}
+	printf("PRINT OUTPUT LAST\n");
+}
+
+
+//==========================PART 2=============================================
+
+void print_bfs(Graph* graph, int source_id) {
+	printf("not yet implemented: put code for part 2 here\n");
+}
+
+void detailed_path(Graph* graph, int source_id, int destination_id) {
+	printf("not yet implemented: put code for part 3 here\n");
+}
+
+void all_paths(Graph* graph, int source_id, int destination_id) {
+	printf("not yet implemented: put code for part 4 here\n");
+}
+
+void shortest_path(Graph* graph, int source_id, int destination_id) {
+	printf("not yet implemented: put code for part 5 here\n");
+}

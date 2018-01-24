@@ -1,0 +1,136 @@
+/* This is the prototype for ASSIGNMENT 1 FOR COMP20007
+   Student Number: 828472
+   Modules List, Queues and Stack make use of code provided by Matt Farrugia
+   */
+
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "traverse.h"
+#include "list.h"
+
+//==========================PART 1=============================================
+//implemented with a stack
+void
+print_dfs(Graph* graph, int source_id){
+	
+	//DECLARATION AND INITIALISATION
+	int i, stack_top;
+	List *tmp_stk;
+	int* vlist = (int*)malloc((graph->maxn)*sizeof(int));
+	Edge* curr_edge;
+	
+	//creating a temporary stack
+	tmp_stk = new_list();
+	
+	//creating list of visited places, marking them to unvisited as default
+	for(i=0;i<(graph->maxn);i++){
+		vlist[i]= 0;
+	}
+	
+	//pushing the vertex's index into stack 
+	list_add_start(tmp_stk, source_id);
+	
+	//looking through stack while its not empty
+	while(!(list_is_empty(tmp_stk))){
+		//pop stack and remember index of the top vertex
+		stack_top = list_remove_start(tmp_stk);
+		
+		//search through all edges if stack if vertex not visited
+		if(!vlist[stack_top]){
+			printf("%s\n", graph->vertices[stack_top]->label);//print names
+			vlist[stack_top] = 1; //mark as visited
+			
+			//look at first edge of vertice
+			curr_edge = graph->vertices[stack_top]->first_edge;
+			
+			//while multiple edges exist
+			while(curr_edge->next_edge){
+				//if already visited that vertex, look at next edge
+				if(vlist[curr_edge->v]){				
+					curr_edge = curr_edge->next_edge;
+				}
+				else{
+					list_add_start(tmp_stk, curr_edge->v); //push stack
+					break;
+				}
+			}
+			//if only one edge left
+			if(!(curr_edge->next_edge)){ //push only edge's destination
+				list_add_start(tmp_stk, curr_edge->v); 	
+			}
+		}
+	}	
+	free_list(tmp_stk); //free the stack to prevent memory leaks
+}
+
+
+
+//==========================PART 2=============================================
+
+void print_bfs(Graph* graph, int source_id){
+	
+	//DECLARATION AND INITIALISATION
+	int i, qfront;
+	List *tmp_q;
+	int* vlist = (int*)malloc((graph->maxn)*sizeof(int));
+	Edge* curr_edge;
+	
+	//creating a temporary queue
+	tmp_q = new_list();
+	
+	//creating list of visited places, marking them to unvisited as default
+	for(i=0;i<(graph->maxn);i++){
+		vlist[i]= 0;
+	}
+	
+	//enqueueing the vertex's index into queue 
+	list_add_end(tmp_q, source_id);
+	
+	//looking through queue while it is not empty
+	while(!(list_is_empty(tmp_q))){
+		//dequeue and remember the head of queue
+		qfront = list_remove_start(tmp_q);
+		
+		if(!vlist[qfront]){
+			//marking start vertex as visited
+			vlist[qfront] = 1;
+			printf("%s\n", graph->vertices[qfront]->label);//print visited
+			
+			//look at first edge of vertice
+			curr_edge = graph->vertices[qfront]->first_edge;
+			
+			//while there are edges from node at front of queue
+			while(curr_edge->next_edge){
+				//if already visited that vertex, look at next edge
+				if(vlist[curr_edge->v]){				
+					curr_edge = curr_edge->next_edge;
+				}
+				else{
+					list_add_end(tmp_q, curr_edge->v);//enqueue breath vertices
+				}
+				
+			}
+			//if only one edge left
+			if(!(curr_edge->next_edge)){ //enqueue only edge's destination
+				list_add_end(tmp_q, curr_edge->v); 	
+			}
+		}	
+		
+		
+	}
+	free_list(tmp_q); //free the queue to prevent memory leaks
+}
+
+void detailed_path(Graph* graph, int source_id, int destination_id) {
+	printf("not yet implemented: put code for part 3 here\n");
+}
+
+void all_paths(Graph* graph, int source_id, int destination_id) {
+	printf("not yet implemented: put code for part 4 here\n");
+}
+
+void shortest_path(Graph* graph, int source_id, int destination_id) {
+	printf("not yet implemented: put code for part 5 here\n");
+}

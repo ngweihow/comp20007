@@ -1,0 +1,145 @@
+/* 828472 COMP20007 Project 1
+
+Code was taken from Matt Farrugia from Workshop 2
+Modified to suit stack functions
+
+
+*/
+
+#include <stdlib.h>
+#include <assert.h>
+#include "stack.h"
+
+typedef struct node Node;
+
+// a stack node points to the next node in the stack, and to some data
+struct node {
+	Node *next;
+	int data;
+};
+
+// a stack points to its first and last nodes, and stores its size (num. nodes)
+struct stack {
+	Node *head;
+	Node *tail;
+	int size;
+};
+
+// helper function to create a new node and return its address
+Node *new_node();
+
+// helper function to clear memory of a node (does not free the node's data)
+void free_node(Node *node);
+
+
+/* * * *
+ * FUNCTION DEFINITIONS
+ */
+
+// create a new stack and return a pointer to it
+stack *new_stack() {
+	stack *stack = malloc(sizeof *stack);
+	assert(stack);
+	
+	stack->head = NULL;
+	stack->tail = NULL;
+	stack->size = 0;
+
+	return stack;
+}
+
+// destroy a stack and free its memory
+void free_stack(Stack *stack) {
+	assert(stack != NULL);
+	// free each node
+	Node *node = stack->head;
+	Node *next;
+	while (node) {
+		next = node->next;
+		free_node(node);
+		node = next;
+	}
+	// free the stack struct itself
+	free(stack);
+}
+
+// helper function to create a new node and return its address
+Node *new_node() {
+	Node *node = malloc(sizeof *node);
+	assert(node);
+	
+	return node;
+}
+
+// helper function to clear memory of a node
+void free_node(Node *node) {
+	free(node);
+}
+
+//PUSH STACK
+// add an element to the front of a stack
+// this operation is O(1)
+void stack_add_start(Stack *stack, int data) {
+	assert(stack != NULL);
+
+	// create and initialise a new stack node
+	Node *node = new_node();
+	node->data = data;
+	node->next = stack->head; // next will be the old first node (may be null)
+
+	// place it at the start of the stack
+	stack->head = node;
+
+	// if stack was empty, this new node is also the last node now
+	if(stack->size == 0) {
+		stack->tail = node;
+	}
+
+	// and we need to keep size updated!
+	stack->size++;
+}
+
+//POP STACK
+// remove and return the front data element from a stack
+// this operation is O(1)
+// error if the stack is empty (so first ensure stack_size() > 0)
+int stack_remove_start(Stack *stack) {
+	assert(stack != NULL);
+	assert(stack->size > 0);
+	
+	// we'll need to save the data to return it
+	Node *start_node = stack->head;
+	int data = start_node->data;
+	
+	// then replace the head with its next node (may be null)
+	stack->head = stack->head->next;
+
+	// if this was the last node in the stack, the tail also needs to be cleared
+	if(stack->size == 1) {
+		stack->tail = NULL;
+	}
+
+	// the stack is now one node smaller
+	stack->size--;
+
+	// and we're finished with the node holding this data
+	free_node(start_node);
+
+	// done!
+	return data;
+}
+
+
+//STACK SIZE
+// return the number of elements contained in a stack
+int stack_size(Stack *stack) {
+	assert(stack != NULL);
+	return stack->size;
+}
+
+//CHECK IF STACK IS EMPTY
+// returns whether the stack contains no elements (true) or some elements (false)
+bool stack_is_empty(Stack *stack) {
+	assert(stack != NULL);
+	return (stack->size==0);
+}

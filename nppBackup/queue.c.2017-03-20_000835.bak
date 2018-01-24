@@ -1,0 +1,149 @@
+/* 828472 COMP20007 Project 1
+
+Code was taken from Matt Farrugia from Workshop 2
+Modified to suit queue functions
+
+
+*/
+
+#include <stdlib.h>
+#include <assert.h>
+#include "queue.h"
+
+typedef struct node Node;
+
+// a queue node points to the next node in the queue, and to some data
+struct node {
+	Node *next;
+	int data;
+};
+
+// a queue points to its first and last nodes, and stores its size (num. nodes)
+struct queue {
+	Node *head;
+	Node *tail;
+	int size;
+};
+
+// helper function to create a new node and return its address
+Node *new_node();
+
+// helper function to clear memory of a node (does not free the node's data)
+void free_node(Node *node);
+
+
+/* * * *
+ * FUNCTION DEFINITIONS
+ */
+
+// create a new queue and return a pointer to it
+Queue *new_queue() {
+	Queue *queue = malloc(sizeof *queue);
+	assert(queue);
+	
+	queue->head = NULL;
+	queue->tail = NULL;
+	queue->size = 0;
+
+	return queue;
+}
+
+// destroy a queue and free its memory
+void free_queue(Queue *queue) {
+	assert(queue != NULL);
+	// free each node
+	Node *node = queue->head;
+	Node *next;
+	while (node) {
+		next = node->next;
+		free_node(node);
+		node = next;
+	}
+	// free the queue struct itself
+	free(queue);
+}
+
+// helper function to create a new node and return its address
+Node *new_node() {
+	Node *node = malloc(sizeof *node);
+	assert(node);
+	
+	return node;
+}
+
+// helper function to clear memory of a node
+void free_node(Node *node) {
+	free(node);
+}
+
+
+//ENQUEUE
+// add an element to the back of a queue
+// this operation is O(1)
+void queue_add_end(Queue *queue, int data) {
+	assert(queue != NULL);
+	
+	// we'll need a new queue node to store this data
+	Node *node = new_node();
+	node->data = data;
+	node->next = NULL; // as the last node, there's no next node
+
+	if(queue->size == 0) {
+		// if the queue was empty, new node is now the first node
+		queue->head = node;
+	} else {
+		// otherwise, it goes after the current last node
+		queue->tail->next = node;
+	}
+	
+	// place this new node at the end of the queue
+	queue->tail = node;
+	
+	// and keep size updated too
+	queue->size++;
+}
+
+// DEQUEUE
+// remove and return the front data element from a queue
+// this operation is O(1)
+// error if the queue is empty (so first ensure queue_size() > 0)
+int queue_remove_start(Queue *queue) {
+	assert(queue != NULL);
+	assert(queue->size > 0);
+	
+	// we'll need to save the data to return it
+	Node *start_node = queue->head;
+	int data = start_node->data;
+	
+	// then replace the head with its next node (may be null)
+	queue->head = queue->head->next;
+
+	// if this was the last node in the queue, the tail also needs to be cleared
+	if(queue->size == 1) {
+		queue->tail = NULL;
+	}
+
+	// the queue is now one node smaller
+	queue->size--;
+
+	// and we're finished with the node holding this data
+	free_node(start_node);
+
+	// done!
+	return data;
+}
+
+
+//CALL FOR QUEUE SIZE
+// return the number of elements contained in a queue
+int queue_size(Queue *queue) {
+	assert(queue != NULL);
+	return queue->size;
+}
+
+//CHECK IF QUEUE IS EMPTY
+// returns whether the queue contains no elements (true) or some elements (false)
+bool queue_is_empty(Queue *queue) {
+	assert(queue != NULL);
+	return (queue->size==0);
+}
